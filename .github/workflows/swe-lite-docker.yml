@@ -32,10 +32,14 @@ jobs:
           path: bench
       - name: clone target
         run: |
-          git clone "${{ inputs.target_repo }}" work
-          cd work
-          if [ -n "${{ inputs.commit }}" ]; then git checkout "${{ inputs.commit }}"; fi
-          git log --oneline -1
+          if [ "${{ inputs.target_repo }}" = "SELF" ]; then
+            mkdir -p work && cp -r bench/harness/selftest/* work/ && ls work
+          else
+            git clone "${{ inputs.target_repo }}" work
+            cd work
+            git checkout "${{ inputs.commit }}"
+            git log --oneline -1
+          fi
       - name: fetch patch
         if: inputs.patch_url != ''
         run: |
@@ -46,9 +50,14 @@ jobs:
           cd work
           PATCH_ARG=""
           if [ -f model.diff ]; then git apply --check model.diff && git apply model.diff && PATCH_ARG="PATCH_APPLIED=1"; fi
-          docker run --rm -v "$PWD:/work" -w /work python:3.12-slim \
-            bash -c "pip install -q pytest && python -m pytest ${{ inputs.tests }} --junitxml=/work/junit.xml -q; echo EXIT_CODE=\$? > /work/pytest.env"
+          cat > run_tests.sh <<'SCRIPT_EOF'
+          pip install -q pytest
+          python -m pytest "$@" --junitxml=/work/junit.xml -q 2>&1 | tee /work/pytest.log
+          echo "EXIT_CODE=${PIPESTATUS[0]}" > /work/pytest.env
+          SCRIPT_EOF
+          docker run --rm -v "$PWD:/work" -w /work python:3.12-slim bash /work/run_tests.sh ${{ inputs.tests }}
           cat pytest.env
+          tail -n 25 pytest.log || true
       - name: score
         run: |
           python bench/harness/score_junit.py work/junit.xml --run-id "${{ inputs.run_id }}" --out "score-${{ inputs.run_id }}.json"

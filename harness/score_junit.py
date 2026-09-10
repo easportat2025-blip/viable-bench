@@ -33,6 +33,7 @@ def main():
     total = passed + failed + error
     score = {
         "run_id": args.run_id,
+        "verdict": "ok" if total else "no-tests-collected",
         "passed": passed,
         "failed": failed,
         "error": error,
