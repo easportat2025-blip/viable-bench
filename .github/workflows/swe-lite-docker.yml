@@ -66,7 +66,7 @@ jobs:
           if [ -f pyproject.toml ] || [ -f setup.py ] || [ -f setup.cfg ]; then
             pip install -q -e . || pip install -q .
           fi
-          python -m pytest "$@" --junitxml=/work/junit.xml -q 2>&1 | tee /work/pytest.log
+          python -m pytest "$@" -o addopts="" --junitxml=/work/junit.xml -q 2>&1 | tee /work/pytest.log
           echo "EXIT_CODE=${PIPESTATUS[0]}" > /work/pytest.env
           SCRIPT_EOF
           docker run --rm -v "$PWD:/work" -w /work python:3.12-slim bash /work/run_tests.sh ${{ inputs.tests }}

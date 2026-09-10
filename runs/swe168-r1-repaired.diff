@@ -1,0 +1,13 @@
+diff --git a/starlite/app.py b/starlite/app.py
+--- a/starlite/app.py
++++ b/starlite/app.py
+@@ -283,6 +283,8 @@ def default_http_exception_handler(self, request: Request, exc: Exception) -> St
+             server_middleware = ServerErrorMiddleware(app=self)
+             return server_middleware.debug_response(request=request, exc=exc)
+         if isinstance(exc, HTTPException):
+-            content = {"detail": exc.detail, "extra": exc.extra}
++            content = {"detail": exc.detail, "extra": exc.extra}
++            if exc.status_code is not None:
++                content["status_code"] = exc.status_code
+         elif isinstance(exc, StarletteHTTPException):
+             content = {"detail": exc.detail}
