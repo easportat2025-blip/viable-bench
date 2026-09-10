@@ -22,7 +22,10 @@ on:
         description: "label for this scoring run"
         required: true
         default: "smoke-001"
-jobs:
+      extra_pip:
+        description: "extra pip pins, e.g. pydantic<2"
+        required: false
+        default: ""jobs:
   score:
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -57,6 +60,8 @@ jobs:
           echo "$APPLY_STATUS" > apply.status
           cat > run_tests.sh <<'SCRIPT_EOF'
           pip install -q pytest
+          EXTRA_PIP="${{ inputs.extra_pip }}"
+          if [ -n "$EXTRA_PIP" ]; then pip install -q $EXTRA_PIP; fi
           if [ -f pyproject.toml ] || [ -f setup.py ] || [ -f setup.cfg ]; then
             pip install -q -e . || pip install -q .
           fi
