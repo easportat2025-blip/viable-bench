@@ -1,0 +1,59 @@
+name: swe-lite-docker
+on:
+  workflow_dispatch:
+    inputs:
+      target_repo:
+        description: "git URL of target repo (pure-python)"
+        required: true
+        default: "https://github.com/pytest-dev/pytest.git"
+      commit:
+        description: "base commit SHA"
+        required: true
+        default: ""
+      patch_url:
+        description: "raw URL of .diff to apply (empty = smoke, no patch)"
+        required: false
+        default: ""
+      tests:
+        description: "pytest node path(s) to run"
+        required: true
+        default: "testing/test_assertion_rewrite.py -q"
+      run_id:
+        description: "label for this scoring run"
+        required: true
+        default: "smoke-001"
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: bench
+      - name: clone target
+        run: |
+          git clone "${{ inputs.target_repo }}" work
+          cd work
+          if [ -n "${{ inputs.commit }}" ]; then git checkout "${{ inputs.commit }}"; fi
+          git log --oneline -1
+      - name: fetch patch
+        if: inputs.patch_url != ''
+        run: |
+          curl -sL "${{ inputs.patch_url }}" -o work/model.diff
+          wc -c work/model.diff
+      - name: eval in docker
+        run: |
+          cd work
+          PATCH_ARG=""
+          if [ -f model.diff ]; then git apply --check model.diff && git apply model.diff && PATCH_ARG="PATCH_APPLIED=1"; fi
+          docker run --rm -v "$PWD:/work" -w /work python:3.12-slim \
+            bash -c "pip install -q pytest && python -m pytest ${{ inputs.tests }} --junitxml=/work/junit.xml -q; echo EXIT_CODE=\$? > /work/pytest.env"
+          cat pytest.env
+      - name: score
+        run: |
+          python bench/harness/score_junit.py work/junit.xml --run-id "${{ inputs.run_id }}" --out "score-${{ inputs.run_id }}.json"
+          cat "score-${{ inputs.run_id }}.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: score-${{ inputs.run_id }}
+          path: score-${{ inputs.run_id }}.json
