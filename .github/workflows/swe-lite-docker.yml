@@ -57,6 +57,9 @@ jobs:
           echo "$APPLY_STATUS" > apply.status
           cat > run_tests.sh <<'SCRIPT_EOF'
           pip install -q pytest
+          if [ -f pyproject.toml ] || [ -f setup.py ] || [ -f setup.cfg ]; then
+            pip install -q -e . || pip install -q .
+          fi
           python -m pytest "$@" --junitxml=/work/junit.xml -q 2>&1 | tee /work/pytest.log
           echo "EXIT_CODE=${PIPESTATUS[0]}" > /work/pytest.env
           SCRIPT_EOF
