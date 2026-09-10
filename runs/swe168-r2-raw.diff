@@ -1,0 +1,11 @@
+diff --git a/litestar/exceptions/responses.py b/litestar/exceptions/responses.py
+index 1a2b3c4d..5e6f7a8b 100644
+--- a/litestar/exceptions/responses.py
++++ b/litestar/exceptions/responses.py
+@@ -100,6 +100,9 @@ def default_http_exception_handler(
+     if isinstance(exc, HTTPException):
+         content = {"detail": exc.detail, "extra": exc.extra}
++        if exc.status_code is not None:
++            content["status_code"] = exc.status_code
+         return HTTPExceptionResponse(
+             status_code

@@ -8,6 +8,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("junit", help="path to junit.xml")
     ap.add_argument("--run-id", required=True)
+    ap.add_argument("--apply-status", default="no-patch")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
@@ -31,9 +32,14 @@ def main():
             passed += 1
 
     total = passed + failed + error
+    if args.apply_status == "rejected":
+        verdict = "patch-rejected"
+    else:
+        verdict = "ok" if total else "no-tests-collected"
     score = {
         "run_id": args.run_id,
-        "verdict": "ok" if total else "no-tests-collected",
+        "apply": args.apply_status,
+        "verdict": verdict,
         "passed": passed,
         "failed": failed,
         "error": error,

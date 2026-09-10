@@ -49,7 +49,12 @@ jobs:
         run: |
           cd work
           PATCH_ARG=""
-          if [ -f model.diff ]; then git apply --check model.diff && git apply model.diff && PATCH_ARG="PATCH_APPLIED=1"; fi
+          APPLY_STATUS="no-patch"
+          if [ -f model.diff ]; then
+            if git apply --check model.diff; then git apply model.diff; APPLY_STATUS="applied";
+            else APPLY_STATUS="rejected"; fi
+          fi
+          echo "$APPLY_STATUS" > apply.status
           cat > run_tests.sh <<'SCRIPT_EOF'
           pip install -q pytest
           python -m pytest "$@" --junitxml=/work/junit.xml -q 2>&1 | tee /work/pytest.log
@@ -60,7 +65,7 @@ jobs:
           tail -n 25 pytest.log || true
       - name: score
         run: |
-          python bench/harness/score_junit.py work/junit.xml --run-id "${{ inputs.run_id }}" --out "score-${{ inputs.run_id }}.json"
+          python bench/harness/score_junit.py work/junit.xml --run-id "${{ inputs.run_id }}" --apply-status "$(cat work/apply.status)" --out "score-${{ inputs.run_id }}.json"
           cat "score-${{ inputs.run_id }}.json"
       - uses: actions/upload-artifact@v4
         with:
