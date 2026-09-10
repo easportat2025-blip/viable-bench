@@ -25,7 +25,8 @@ on:
       extra_pip:
         description: "extra pip pins, e.g. pydantic<2"
         required: false
-        default: ""jobs:
+        default: ""
+jobs:
   score:
     runs-on: ubuntu-latest
     timeout-minutes: 120
