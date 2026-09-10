@@ -34,6 +34,8 @@ def main():
     total = passed + failed + error
     if args.apply_status == "rejected":
         verdict = "patch-rejected"
+    elif args.apply_status == "bad-download":
+        verdict = "patch-download-failed"
     else:
         verdict = "ok" if total else "no-tests-collected"
     score = {

@@ -55,7 +55,8 @@ jobs:
           PATCH_ARG=""
           APPLY_STATUS="no-patch"
           if [ -f model.diff ]; then
-            if git apply --check model.diff; then git apply model.diff; APPLY_STATUS="applied";
+            if ! grep -q "^diff --git" model.diff; then APPLY_STATUS="bad-download";
+            elif git apply --check model.diff; then git apply model.diff; APPLY_STATUS="applied";
             else APPLY_STATUS="rejected"; fi
           fi
           echo "$APPLY_STATUS" > apply.status
