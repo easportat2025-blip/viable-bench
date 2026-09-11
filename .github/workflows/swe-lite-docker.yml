@@ -26,6 +26,10 @@ on:
         description: "extra pip pins, e.g. pydantic<2"
         required: false
         default: ""
+      test_url:
+        description: "raw URL of custom repro test file (saved as test_repro_viable.py; set tests accordingly)"
+        required: false
+        default: ""
 jobs:
   score:
     runs-on: ubuntu-latest
@@ -49,6 +53,11 @@ jobs:
         run: |
           curl -sL "${{ inputs.patch_url }}" -o work/model.diff
           wc -c work/model.diff
+      - name: fetch repro test
+        if: inputs.test_url != ''
+        run: |
+          curl -sL "${{ inputs.test_url }}" -o work/test_repro_viable.py
+          wc -c work/test_repro_viable.py && head -c 200 work/test_repro_viable.py
       - name: eval in docker
         run: |
           cd work
