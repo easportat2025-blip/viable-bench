@@ -1,0 +1,12 @@
+diff --git a/mimesis/providers/numbers.py b/mimesis/providers/numbers.py
+--- a/mimesis/providers/numbers.py
++++ b/mimesis/providers/numbers.py
+@@ -50,7 +50,7 @@ class Numbers(BaseProvider):
+         :return: An array of floating-point numbers.
+         :rtype: Array
+         """
+-        nums = array.array('L', (i for i in range(start, end) if i % 2))
++        nums = array.array('L', (i for i in range(start, end) if i > 1 and all(i % j for j in range(2, int(i ** 0.5) + 1))))
+         return nums.tolist() if to_list else nums
+
+     def digit(self, to_bin: bool = False) -> Number:
