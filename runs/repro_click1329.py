@@ -13,6 +13,6 @@ def cli(ctx, opt):
 def test_parameter_source_tracked():
     assert hasattr(click, "ParameterSource"), "no ParameterSource"
     r1 = CliRunner().invoke(cli, [])
-    assert "SRC=ParameterSource.DEFAULT" in r1.output, r1.output
+    assert "SRC=DEFAULT" in r1.output, r1.output
     r2 = CliRunner().invoke(cli, ["--opt", "5"])
-    assert "SRC=ParameterSource.COMMANDLINE" in r2.output, r2.output
+    assert "SRC=COMMANDLINE" in r2.output, r2.output
