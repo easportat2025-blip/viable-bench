@@ -11,7 +11,11 @@ def hhttp(request, exc):
     return "hhttp"
 
 
+class MyErr(HTTPException):
+    def __init__(self):
+        super().__init__(404, "x")
+
+
 def test_mro_beats_500_fallback():
-    exc = HTTPException(status_code=404)
-    got = get_exception_handler({500: h500, HTTPException: hhttp}, exc)
+    got = get_exception_handler({500: h500, HTTPException: hhttp}, MyErr())
     assert got is hhttp, got
