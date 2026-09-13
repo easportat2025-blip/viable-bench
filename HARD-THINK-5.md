@@ -12,7 +12,7 @@ Tung dong xu cong bang doc lap cho den khi lan dau xuat hien mau HTH lien tiep.
 Tinh ky vong so lan tung. Lap trang thai + he phuong trinh ro rang.
 (Khong dung gia dinh cac cua so 3-lan-tung doc lap.)
 
-**Key:** E = 8. Trang thai: {} (0 khop), {H} (1), {HT} (2), {HTH} (0, hut). E0 = 1 + 0.5*E1 + 0.5*E0; E1 = 1 + 0.5*E1 + 0.5*E2; E2 = 1 + 0.5*E1 + 0.5*0 (T ve 1 neu ra H? dung: tu HT +T -> HTT ve 0? chuan: HT + H -> HTH hut; HT + T -> HTT ~ trang thai 0). Giai: E0=8.
+**Key:** E = 10 (DA SUA TU 8 NGAY 2026-09-14: model tu giai ra 10, verify 2 cach — Markov + Conway borders (HTH co border H dai 1 nen E=2^3+2^1=10); HHT moi la 8). Trang thai: {} (0 khop), {H} (1), {HT} (2), {HTH} (0, hut). E0 = 1 + 0.5*E1 + 0.5*E0; E1 = 1 + 0.5*E1 + 0.5*E2; E2 = 1 + 0.5*0 + 0.5*E0 (HTT ve 0). Giai: E0=10.
 **Check:** co trang thai dung (dac biet tu HTT ve 0 chu khong ve 1) + he 3 phuong trinh + E=8. Bay window-independence phai noi ro.
 
 ## T2 — Lich tac vu (toi uu + chung minh)
